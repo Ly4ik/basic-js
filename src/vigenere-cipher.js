@@ -20,14 +20,61 @@ const { NotImplementedError } = require('../extensions/index.js');
  * 
  */
 class VigenereCipheringMachine {
-  encrypt() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+  constructor(direct = true) {
+    this.direct = direct;
   }
-  decrypt() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+
+  encrypt(message, key) {
+   if (typeof message !== 'string' || typeof key !== 'string') {
+    throw new Error('Incorrect arguments!');
+   }
+
+   const charCodeA = 'A'.charCodeAt(0);
+   const result = [];
+   let keyIndex = 0;
+
+   for (let i = 0; i < message.length; i++) {
+       const char = message[i].toUpperCase();
+
+       if (/^[A-Z]$/.test(char)) {
+           const shift = key[keyIndex % key.length].toUpperCase().charCodeAt(0) - charCodeA;
+           const transformedCharCode = char.charCodeAt(0) + 1 * shift;
+           const resultCharCode = ((transformedCharCode - charCodeA + 26) % 26) + charCodeA;
+
+           result.push(String.fromCharCode(resultCharCode));
+           keyIndex++;
+       } else {
+           result.push(char);
+       }
+   }
+   return this.direct ? result.join('') : result.reverse().join('');
   }
+
+  decrypt(encryptedMessage, key) {
+    if (typeof encryptedMessage !== 'string' || typeof key !== 'string') {
+      throw new Error('Incorrect arguments!');
+     }
+     
+    const charCodeA = 'A'.charCodeAt(0);
+    const result = [];
+    let keyIndex = 0;
+
+    for (let i = 0; i < encryptedMessage.length; i++) {
+        const char = encryptedMessage[i].toUpperCase();
+
+        if (/^[A-Z]$/.test(char)) {
+            const shift = key[keyIndex % key.length].toUpperCase().charCodeAt(0) - charCodeA;
+            const transformedCharCode = char.charCodeAt(0) - 1 * shift;
+            const resultCharCode = ((transformedCharCode - charCodeA + 26) % 26) + charCodeA;
+
+            result.push(String.fromCharCode(resultCharCode));
+            keyIndex++;
+        } else {
+            result.push(char);
+        }
+    }
+    return this.direct ? result.join('') : result.reverse().join('');
+    }
 }
 
 module.exports = {
